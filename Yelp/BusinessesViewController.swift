@@ -8,9 +8,11 @@
 
 import UIKit
 
-class BusinessesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate{
+class BusinessesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate,  UISearchResultsUpdating{
 
     var businesses: [Business]!
+    var filteredBusinesses: [Business]!
+    var searchController: UISearchController!
     
     
     @IBOutlet weak var tableView: UITableView!
@@ -23,6 +25,20 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
         
         tableView.rowHeight = UITableViewAutomaticDimension
         tableView.estimatedRowHeight = 120
+        
+        
+        searchController = UISearchController(searchResultsController: nil)
+        searchController.searchResultsUpdater = self
+        
+        ///
+        self.searchController.hidesNavigationBarDuringPresentation = false
+        
+        searchController.dimsBackgroundDuringPresentation = false
+        searchController.searchBar.sizeToFit()
+        self.navigationItem.titleView = searchController.searchBar
+        
+        //tableView.tableHeaderView = searchController.searchBar
+        self.definesPresentationContext = true
         
         Business.searchWithTerm("Thai", completion: { (businesses: [Business]!, error: NSError!) -> Void in
             self.businesses = businesses
@@ -76,6 +92,19 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
         return cell
         
     
+    }
+    
+    
+    func updateSearchResultsForSearchController(searchController: UISearchController) {
+        /**
+        if let searchText = searchController.searchBar.text {
+            filteredMovies = searchText.isEmpty ? movies : movies!.filter({(movie: NSDictionary) -> Bool in
+                return (movie["title"] as! String).rangeOfString(searchText, options: .CaseInsensitiveSearch) != nil
+            })
+
+        
+        }**/
+        tableView.reloadData()
     }
     /*
     // MARK: - Navigation
