@@ -22,6 +22,7 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
         super.viewDidLoad()
         tableView.delegate = self
         tableView.dataSource = self
+    
         
         tableView.rowHeight = UITableViewAutomaticDimension
         tableView.estimatedRowHeight = 120
@@ -42,6 +43,7 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
         
         Business.searchWithTerm("Thai", completion: { (businesses: [Business]!, error: NSError!) -> Void in
             self.businesses = businesses
+            self.filteredBusinesses = self.businesses
             self.tableView.reloadData()
         
             for business in businesses {
@@ -73,8 +75,8 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
     
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if businesses != nil {
-            return businesses!.count
+        if filteredBusinesses != nil {
+            return filteredBusinesses!.count
         } else  {
             return 0
         }
@@ -87,7 +89,7 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
         
         let cell = tableView.dequeueReusableCellWithIdentifier("BusinessCell", forIndexPath: indexPath) as! BusinessCell
         
-        cell.business = businesses[indexPath.row]
+        cell.business = filteredBusinesses[indexPath.row]
         
         return cell
         
@@ -96,15 +98,13 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
     
     
     func updateSearchResultsForSearchController(searchController: UISearchController) {
-        /**
+        
         if let searchText = searchController.searchBar.text {
-            filteredMovies = searchText.isEmpty ? movies : movies!.filter({(movie: NSDictionary) -> Bool in
-                return (movie["title"] as! String).rangeOfString(searchText, options: .CaseInsensitiveSearch) != nil
-            })
+            filteredBusinesses = searchText.isEmpty ? businesses : businesses!.filter{$0.name!.rangeOfString(searchText, options: .CaseInsensitiveSearch) !=  nil}
 
         
-        }**/
-        tableView.reloadData()
+        }
+               tableView.reloadData()
     }
     /*
     // MARK: - Navigation
