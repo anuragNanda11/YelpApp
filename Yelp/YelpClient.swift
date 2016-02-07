@@ -24,6 +24,7 @@ enum YelpSortMode: Int {
 class YelpClient: BDBOAuth1RequestOperationManager {
     var accessToken: String!
     var accessSecret: String!
+    var offset = 0
     
     class var sharedInstance : YelpClient {
         struct Static {
@@ -60,6 +61,8 @@ class YelpClient: BDBOAuth1RequestOperationManager {
 
         // Default the location to San Francisco
         var parameters: [String : AnyObject] = ["term": term, "ll": "37.785771,-122.406165"]
+        
+        parameters["offset"] = "\(offset)"
 
         if sort != nil {
             parameters["sort"] = sort!.rawValue
@@ -78,6 +81,8 @@ class YelpClient: BDBOAuth1RequestOperationManager {
         return self.GET("search", parameters: parameters, success: { (operation: AFHTTPRequestOperation!, response: AnyObject!) -> Void in
             let dictionaries = response["businesses"] as? [NSDictionary]
             if dictionaries != nil {
+                self.offset = dictionaries!.count
+                print(self.offset)
                 completion(Business.businesses(array: dictionaries!), nil)
             }
             }, failure: { (operation: AFHTTPRequestOperation?, error: NSError!) -> Void in

@@ -8,11 +8,13 @@
 
 import UIKit
 
-class BusinessesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate,  UISearchResultsUpdating{
+class BusinessesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate,  UISearchResultsUpdating,  UIScrollViewDelegate   {
 
     var businesses: [Business]!
     var filteredBusinesses: [Business]!
     var searchController: UISearchController!
+    var isMoreDataLoading = false
+
     
     
     @IBOutlet weak var tableView: UITableView!
@@ -71,6 +73,10 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
     
     }
     
+    func makeSearchRequest() {
+        
+    }
+    
     
     
     
@@ -106,6 +112,25 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
         }
                tableView.reloadData()
     }
+    
+    
+    
+    func scrollViewDidScroll(scrollView: UIScrollView) {
+        // Handle scroll behavior here
+        if (!isMoreDataLoading) {
+            isMoreDataLoading = true
+            
+            let scrollViewContentHeight = tableView.contentSize.height
+            let scrollOffsetThreshold = scrollViewContentHeight - tableView.bounds.size.height
+            
+            // When the user has scrolled past the threshold, start requesting
+            if(scrollView.contentOffset.y > scrollOffsetThreshold && tableView.dragging) {
+                isMoreDataLoading = true
+                
+            }
+        }
+    }
+    
     /*
     // MARK: - Navigation
 
