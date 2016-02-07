@@ -9,7 +9,7 @@
 import UIKit
 
 class BusinessesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate,  UISearchResultsUpdating,  UIScrollViewDelegate   {
-
+    
     var businesses: [Business]!
     var filteredBusinesses: [Business]!
     var searchController: UISearchController!
@@ -42,17 +42,8 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
         
         //tableView.tableHeaderView = searchController.searchBar
         self.definesPresentationContext = true
+        loadData()
         
-        Business.searchWithTerm("Thai", completion: { (businesses: [Business]!, error: NSError!) -> Void in
-            self.businesses = businesses
-            self.filteredBusinesses = self.businesses
-            self.tableView.reloadData()
-        
-            for business in businesses {
-                print(business.name!)
-                print(business.address!)
-            }
-        })
 
 /* Example of Yelp search with more search options specified
         Business.searchWithTerm("Restaurants", sort: .Distance, categories: ["asianfusion", "burgers"], deals: true) { (businesses: [Business]!, error: NSError!) -> Void in
@@ -73,7 +64,25 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
     
     }
     
-    func makeSearchRequest() {
+    func loadData() {
+        
+       
+        Business.searchWithTerm("Thai", completion: { (businesses: [Business]!, error: NSError!) -> Void in
+            if(self.businesses == nil) {
+                self.businesses = businesses
+            } else {
+                
+                self.businesses.appendContentsOf(businesses)
+            }
+            
+            self.isMoreDataLoading = false
+            self.filteredBusinesses = self.businesses
+            self.tableView.reloadData()
+            //for business in businesses {
+                //print(business.name!)
+                //print(business.address!)
+            //}
+        })
         
     }
     
@@ -94,7 +103,9 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCellWithIdentifier("BusinessCell", forIndexPath: indexPath) as! BusinessCell
+        //print(indexPath.row)
         
+       
         cell.business = filteredBusinesses[indexPath.row]
         
         return cell
@@ -116,20 +127,21 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
     
     
     func scrollViewDidScroll(scrollView: UIScrollView) {
-        // Handle scroll behavior here
+        
         if (!isMoreDataLoading) {
-            isMoreDataLoading = true
-            
+            // Calculate the position of one screen length before the bottom of the results
             let scrollViewContentHeight = tableView.contentSize.height
             let scrollOffsetThreshold = scrollViewContentHeight - tableView.bounds.size.height
             
             // When the user has scrolled past the threshold, start requesting
             if(scrollView.contentOffset.y > scrollOffsetThreshold && tableView.dragging) {
-                isMoreDataLoading = true
                 
+                isMoreDataLoading = true
+                loadData()
             }
         }
-    }
+        
+}
     
     /*
     // MARK: - Navigation
